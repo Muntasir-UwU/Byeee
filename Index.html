@@ -1,0 +1,162 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bye</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.34/dist/lenis.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Oswald', sans-serif;
+            background-color: #FFF0F5;
+            overflow-x: hidden;
+        }
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+        nav span {
+            font-size: clamp(1rem, 4vw, 1.2rem);
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: #ffffff;
+            color: #FF69B4;
+            padding: 8px 30px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.15);
+        }
+        #bg-container, #bg-contain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            align-content: space-evenly;
+            gap: 1.5rem;
+            padding: 20px;
+            overflow: hidden;
+        }
+        .tiny-love, .tiny-bye {
+            font-size: clamp(14px, 4vw, 20px);
+            user-select: none;
+            white-space: nowrap;
+            display: inline-block;
+            transform: rotate(-15deg);
+        }
+        .tiny-love { color: #FFB6C1; opacity: 0.5; }
+        .tiny-bye { color: #DB7093; opacity: 0; }
+        .scroll-section {
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .big-bye {
+            font-size: clamp(150px, 32vw, 500px);
+            font-weight: 700;
+            line-height: 1;
+            color: #FFC0CB;
+            white-space: nowrap;
+            position: absolute;
+            left: 5%;
+            transform: translateX(0%);
+            will-change: transform;
+        }
+        .scroll-hint {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #FF69B4;
+            opacity: 0.8;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        .spacer {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(2.5rem, 10vw, 4.5rem);
+            color: #FF1493;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav><span id="nav-text">MY Love</span></nav>
+    <div id="bg-container"></div>
+    <div id="bg-contain"></div>
+    <section class="scroll-section">
+        <h1 class="big-bye" id="main-text"></h1>
+        <h2 class="scroll-hint">Scroll Down</h2>
+    </section>
+    <div class="spacer"><p>I win. &hearts;</p></div>
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+        requestAnimationFrame(raf);
+
+        const mainText = document.getElementById('main-text');
+        mainText.textContent = "By" + "e".repeat(45);
+
+        const createBG = (containerId, className, text) => {
+            const container = document.getElementById(containerId);
+            for (let i = 0; i < 200; i++) {
+                const span = document.createElement('span');
+                span.classList.add(className);
+                span.innerText = text;
+                container.appendChild(span);
+            }
+        };
+        createBG('bg-container', 'tiny-love', 'MY Love');
+        createBG('bg-contain', 'tiny-bye', 'bye');
+
+        gsap.to(".tiny-love", {
+            scrollTrigger: { trigger: "body", start: "top top", end: "30% top", scrub: 1 },
+            opacity: 0, scale: 0.5, stagger: { amount: 2, from: "random" }
+        });
+        gsap.to(".tiny-bye", {
+            scrollTrigger: { trigger: "body", start: "40% top", end: "bottom bottom", scrub: 1 },
+            opacity: 0.6, stagger: { amount: 3, from: "random" }, y: -50
+        });
+        gsap.to(".scroll-hint", {
+            scrollTrigger: { trigger: "body", start: "top top", end: "10% top", scrub: true },
+            opacity: 0, y: 40
+        });
+        gsap.to("#nav-text", {
+            scrollTrigger: { trigger: ".scroll-section", start: "20% top", end: "40% top", scrub: true,
+                onUpdate: (self) => { document.getElementById('nav-text').innerText = self.progress > 0.5 ? "BYE" : "MY Love"; }
+            }
+        });
+
+        gsap.to(".big-bye", {
+            x: () => -(mainText.offsetWidth - window.innerWidth / 2),
+            color: "#FF1493",
+            scrollTrigger: {
+                trigger: ".scroll-section", pin: true, start: "top top", end: "+=4000", scrub: 1, invalidateOnRefresh: true
+            }
+        });
+    </script>
+</body>
+</html>
